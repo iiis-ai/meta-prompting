@@ -4,10 +4,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)
 [![Website](https://img.shields.io/badge/Project-Website-green)](https://meta-prompting.github.io) 
+[![Conference](https://img.shields.io/badge/Published-ICLR_2024_BGPT_Workshop-blue)](https://iclr.cc/)
 
-This is the official repository for the paper **"Meta Prompting for AI Systems"** (https://arxiv.org/abs/2311.11482).
+This is the official repo for the paper **"Meta Prompting for AI Systems"** (https://arxiv.org/abs/2311.11482).
 
-> **Abstract:** We introduce Meta Prompting (MP), a framework that elevates the reasoning capabilities of large language models (LLMs) by focusing on the formal structure of a task rather than content-specific examples. We establish a theoretical foundation for this paradigm, formalizing MP as a functor that maps a category of tasks to a category of structured prompts, thereby guaranteeing that compositional problem-solving strategies can be systematically decomposed into modular prompt structures. We extend this concept to Recursive Meta Prompting (RMP), an automated process where an LLM can generate and refine its own prompts. We model this self-improvement loop formally as a monad, providing a principled framework for automated prompt engineering. Our claims are validated through extensive experiments demonstrating that a Qwen-72B base model, guided by a single, example-agnostic meta-prompt, achieves state-of-the-art results on MATH, GSM8K, and Game of 24. These results are achieved with substantial token efficiency gains over traditional few-shot methods.
+> **Abstract:** We introduce Meta Prompting (MP), a framework that elevates the reasoning capabilities of large language models (LLMs) by focusing on the formal structure of a task rather than content-specific examples. We establish a theoretical foundation for this paradigm, formalizing MP as a functor that maps a category of tasks to a category of structured prompts, thereby guaranteeing that compositional problem-solving strategies can be systematically decomposed into modular prompt structures. We extend this concept to Recursive Meta Prompting (RMP), an automated process where an LLM can generate and refine its own prompts. We model this self-improvement loop formally as a monad, providing a principled framework for automated prompt engineering. Our claims are validated through several experiments demonstrating that a Qwen-72B base model, guided by a single, example-agnostic meta-prompt, achieves improved results on MATH, GSM8K, and Game of 24. These results are achieved with substantial token efficiency gains over traditional few-shot methods.
 
 ---
 
@@ -15,14 +16,15 @@ This is the official repository for the paper **"Meta Prompting for AI Systems"*
 - [What is Meta Prompting?](#what-is-meta-prompting)
 - [Key Contributions](#key-contributions)
 - [A Formal Framework](#a-formal-framework)
-- [🚀 State-of-the-Art Results](#-state-of-the-art-results)
+  - [The Meta Prompting Functor](#the-meta-prompting-functor)
+  - [The Recursive Monad](#the-recursive-monad)
+- [Multi-Modal Meta Prompting](#multi-modal-meta-prompting)
+- [Experimental Results](#experimental-results)
   - [MATH Benchmark](#math-benchmark)
   - [GSM8K Benchmark](#gsm8k-benchmark)
   - [Game of 24](#game-of-24)
 - [Getting Started: Try Meta Prompting](#getting-started-try-meta-prompting)
 - [Citation](#citation)
-
----
 
 ## What is Meta Prompting?
 
@@ -45,11 +47,12 @@ Integrate step-by-step reasoning to solve mathematical problems under the follow
   "Solution": {
     "Step 1": "Begin the response with 'Let's think step by step.'",
     "Step 2": "Follow with the reasoning steps, ensuring the solution process is broken down clearly and logically.",
-    "Step 3": "End the solution with the final answer encapsulated in a LaTeX-formatted box, $\boxed{...}$"
+    "Step 3": "End the solution with the final answer encapsulated in a LaTeX-formatted box, $\\boxed{...}$"
   },
   "Final Answer": "[final answer]"
 }
-````
+
+```
 
 #### Few-Shot Prompt: Concrete Examples
 
@@ -70,32 +73,61 @@ Final Answer: The final answer is $24$.
 
 ---------
 ...
-```
 
------
+```
 
 ## Key Contributions
 
-  - **Introduces Meta Prompting (MP):** A new, example-agnostic prompting paradigm that focuses on the formal structure of reasoning.
-  - **Establishes a Theoretical Foundation:** We formalize MP using category theory, modeling it as a **functor** that guarantees compositional problem-solving.
-  - **Defines Recursive Meta Prompting (RMP):** We introduce a process for automated prompt engineering and self-improvement, which we formalize as a **monad**.
-  - **Achieves State-of-the-Art Performance:** Using a *single, zero-shot meta-prompt*, our method sets new SOTA results on benchmarks like MATH (46.3%) and GSM8K (83.5%) with a base Qwen-72B model, outperforming fine-tuned models and even GPT-4.
-
------
+* **Introduces Meta Prompting (MP):** A new, example-agnostic prompting paradigm that focuses on the formal structure of reasoning.
+* **Establishes a Theoretical Foundation:** We formalize MP using category theory, modeling it as a **functor** that guarantees compositional problem-solving.
+* **Defines Recursive Meta Prompting (RMP):** We introduce a process for automated prompt engineering and self-improvement, which we formalize as a **monad**.
+* **Achieves Strong Performance:** Using a *single, zero-shot meta-prompt*, our method sets new results on benchmarks like MATH (46.3%) and GSM8K (83.5%) with a base Qwen-72B model, outperforming fine-tuned models and early GPT-4 versions in zero-shot settings.
 
 ## A Formal Framework
 
 A core novelty of our work is providing a rigorous mathematical foundation for prompt engineering.
 
-### Meta Prompting as a Functor
+### The Meta Prompting Functor
 
-We model Meta Prompting as a functor $\\mathcal{M}: \\mathcal{T} \\to \\mathcal{P}$ that maps a category of tasks ($\\mathcal{T}$) to a category of prompts ($\\mathcal{P}$). This ensures that if a complex task can be broken down into simpler sub-tasks, the corresponding prompt can also be constructed by composing simpler prompts. This provides a theoretical guarantee of **modularity and compositionality**.
+We model Meta Prompting as a functor  that maps a category of tasks () to a category of prompts (). This ensures that if a complex task can be broken down into simpler sub-tasks, the corresponding prompt can also be constructed by composing simpler prompts. This provides a theoretical guarantee of **modularity and compositionality**.
 
-### Recursive Meta Prompting as a Monad
+### The Recursive Monad
 
-We model the process of an LLM refining its own prompts (RMP) as a monad. This framework provides a principled way to manage self-improvement, ensuring the process is stable and consistent. The workflow can be visualized as a `Meta-Meta-Prompt` guiding a "Proposer" LLM to generate a task-specific meta-prompt, which is then used by an "Executor" LLM.
+We model the process of an LLM refining its own prompts (Recursive Meta Prompting) as a monad  over the category of prompts . Specifically, we employ a **Writer Monad** structure to model the accumulation of refinement strategies (edit scripts). Let  be the set of valid edit scripts forming a monoid .
 
------
+* **Endofunctor **: For any prompt object , . This preserves the edit history while the prompt structure transforms.
+* **Unit ()**: The natural transformation  lifts a prompt into the refinement context with an empty history.
+* **Multiplication ()**: The natural transformation collapses nested levels of meta-reasoning. It ensures that recursive optimization steps are linearly composed into a single, coherent edit trace:
+
+
+
+This framework guarantees that the refinement process is algebraically consistent and stable.
+
+## Multi-Modal Meta Prompting
+
+Grounded in **Type Theory**, our framework extends naturally to multi-modal settings. Just as type systems in programming ensure that different data types are handled correctly, a meta-prompt can enforce a clear, syntactic structure on inputs and outputs across modalities (text, images, audio).
+
+We define schemas that create explicit, typed "slots" for different data streams, enabling the model to synthesize information to generate a cohesive output.
+
+```xml
+<task_schema>
+    <input_slots>
+        <data type="image/png" name="problem_diagram">
+            </data>
+        <data type="audio/mp3" name="verbal_instructions">
+            </data>
+        <data type="model/obj" name="object_model">
+            </data>
+    </input_slots>
+    <output_schema>
+        <synthesis type="text/markdown" name="analysis_summary">
+            </synthesis>
+        <result type="video/mp4" name="solution_animation">
+            </result>
+    </output_schema>
+</task_schema>
+
+```
 
 ## Experimental Results
 
@@ -105,43 +137,41 @@ Our experiments show that Meta Prompting unlocks powerful reasoning in base lang
 
 With a single meta-prompt, Qwen-72B (base) surpasses all other open-source models and even the initial release of GPT-4.
 
-| Model                 | FT-Dataset | Tool Usage | Eval Method | MATH (%)     |
-| --------------------- | ---------- | ---------- | ----------- | ------------ |
-| **Proprietary Models**|            |            |             |              |
-| Claude-2              | -          | No         | CoT         | 32.5         |
-| Minerva-540B          | Arxiv+Web  | No         | CoT         | 33.6         |
-| PaLM-2                | -          | No         | CoT         | 34.3         |
-| GPT-4 (2023-0314)     | -          | No         | CoT         | 42.5         |
-| **Open-source Models**|            |            |             |              |
-| Llama-2-70B (base)    | -          | No         | CoT         | 13.5         |
-| Qwen-14B (base)       | -          | No         | **MP** | **28.9** |
-| Qwen-72B-MetaMathQA   | MetaMathQA | No         | CoT         | 41.7         |
-| Qwen-72B (base)       | -          | No         | **MP** | **46.3** |
+| Model | FT-Dataset | Tool Usage | Eval Method | MATH (%) |
+| --- | --- | --- | --- | --- |
+| **Proprietary Models** |  |  |  |  |
+| Claude-2 | - | No | CoT | 32.5 |
+| Minerva-540B | Arxiv+Web | No | CoT | 33.6 |
+| PaLM-2 | - | No | CoT | 34.3 |
+| GPT-4 (2023-0314) | - | No | CoT | 42.5 |
+| **Open-source Models** |  |  |  |  |
+| Llama-2-70B (base) | - | No | CoT | 13.5 |
+| Qwen-14B (base) | - | No | **MP** | **28.9** |
+| Qwen-72B-MetaMathQA | MetaMathQA | No | CoT | 41.7 |
+| Qwen-72B (base) | - | No | **MP** | **46.3** |
 
 ### GSM8K Benchmark
 
 Our zero-shot meta-prompting approach again shows substantial improvements over both base models with CoT and powerful fine-tuned models.
 
-| Model               | FT-Dataset | Tool Usage | Eval Method | GSM8K (%) |
-| ------------------- | ---------- | ---------- | ----------- | --------- |
-| Llama-2-70B (base)  | -          | No         | CoT         | 56.8      |
-| Qwen-14B (base)     | -          | No         | **MP** | **64.8** |
-| WizardMath-70B      | WizardMath | No         | CoT         | 81.6      |
-| MetaMath-70B        | MetaMathQA | No         | CoT         | 82.3      |
-| Qwen-72B (base)     | -          | No         | **MP** | **83.5** |
+| Model | FT-Dataset | Tool Usage | Eval Method | GSM8K (%) |
+| --- | --- | --- | --- | --- |
+| Llama-2-70B (base) | - | No | CoT | 56.8 |
+| Qwen-14B (base) | - | No | **MP** | **64.8** |
+| WizardMath-70B | WizardMath | No | CoT | 81.6 |
+| MetaMath-70B | MetaMathQA | No | CoT | 82.3 |
+| Qwen-72B (base) | - | No | **MP** | **83.5** |
 
 ### Game of 24
 
 Meta Prompting achieves a 100% success rate by generating a single Python program to solve all puzzles, demonstrating extreme efficiency compared to iterative methods like Tree-of-Thought (ToT).
 
-| Method             | LLM Sessions (per sample) | Generate/Prompt tokens      | Cost (per sample) | Success Rate |
-| ------------------ | ------------------------- | --------------------------- | ----------------- | ------------ |
-| IO (best of 100)   | 100                       | 1.8k / 1.0k                 | $0.13            | 33%          |
-| CoT (best of 100)  | 100                       | 6.7k / 2.2k                 | $0.47            | 49%          |
-| ToT (breadth=5)    | 61.72                     | 5.5k / 1.4k                 | $0.74            | 74%          |
+| Method | LLM Sessions (per sample) | Generate/Prompt tokens | Cost (per sample) | Success Rate |
+| --- | --- | --- | --- | --- |
+| IO (best of 100) | 100 | 1.8k / 1.0k | $0.13 | 33% |
+| CoT (best of 100) | 100 | 6.7k / 2.2k | $0.47 | 49% |
+| ToT (breadth=5) | 61.72 | 5.5k / 1.4k | $0.74 | 74% |
 | **MP** | **1/N** | **≈ 1/N (8k / 1k)** | **≈ $0.0003** | **100%** |
-
------
 
 ## Getting Started: Try Meta Prompting
 
@@ -164,27 +194,27 @@ Here is the meta-prompt used for the MATH benchmark, which you can use directly.
 3. End the solution with the final answer encapsulated in a LaTeX-formatted box, $\boxed{...}$, for clarity and emphasis.
 4. Finally, state "The answer is [final answer to the problem].", with the final answer presented in LaTeX notation.
 ---------
+
 ```
 
 ### Live Demos (Custom GPTs)
 
 You can try out various versions of Meta Prompting agents via these custom GPTs:
 
-  - **🤖 CR Agent (Complex Reasoning):** [v0.1](https://chat.openai.com/g/g-L3a4ZCIHx-cr-agent-v0-1) | [v0.2 (XML)](https://www.google.com/search?q=https://chat.openai.com/g/g-cJV031wLP-cr-agent-xml-v0-2)
-  - **✍️ MP-PT (Prompt Revision):** [Online Demo](https://chat.openai.com/g/g-o54JV8zr7-mp-pt)
-  - **🔄 MP-ICPD (Recursive In-Context Prompt Design):** [Online Demo](https://www.google.com/search?q=https://chat.openai.com/g/g-9d0iBPnzR-mp-icpd)
-
------
+* **🤖 CR Agent (Complex Reasoning):** [v0.1](https://chat.openai.com/g/g-L3a4ZCIHx-cr-agent-v0-1) | [v0.2 (XML)](https://chat.openai.com/g/g-cJV031wLP-cr-agent-xml-v0-2)
+* **✍️ MP-PT (Prompt Revision):** [Online Demo](https://chat.openai.com/g/g-o54JV8zr7-mp-pt)
+* **🔄 MP-ICPD (Recursive In-Context Prompt Design):** [Online Demo](https://chat.openai.com/g/g-9d0iBPnzR-mp-icpd)
 
 ## Citation
 
-If you find our work useful for your research, please consider citing our paper and starring this repository. Thank you\!
+If you find our work useful for your research, please consider citing our paper and starring this repository. Thank you!
 
 ```bibtex
 @article{zhang2023meta,
   title={Meta Prompting for AI Systems},
   author={Zhang, Yifan and Yuan, Yang and Yao, Andrew Chi-Chih},
   journal={arXiv preprint arXiv:2311.11482},
-  year={2023}
+  year={2023},
+  note={Published in ICLR 2024 BGPT Workshop}
 }
 ```
